@@ -186,7 +186,17 @@ impl<'a> Parser<'a> {
 
                 match key {
                     b"id" => attributes.id = value,
-                    b"class" => attributes.class = value,
+                    b"class" => {
+                        let map = value
+                            .as_ref()
+                            .and_then(Bytes::try_as_utf8_str)
+                            .map(str::split_ascii_whitespace)
+                            .unwrap()
+                            .map(|s| s.to_string())
+                            .collect();
+                        attributes.class = value;
+                        attributes.class_map = Some(map);
+                    },
                     _ => attributes.raw.insert(key.into(), value),
                 };
             }

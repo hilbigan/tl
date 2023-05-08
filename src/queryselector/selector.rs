@@ -43,7 +43,7 @@ impl<'a> Selector<'a> {
                 .map_or(false, |t| t._attributes.id == Some((*id).into())),
             Self::Class(class) => node
                 .as_tag()
-                .map_or(false, |t| t._attributes.is_class_member(*class)),
+                .map_or(false, |t| t._attributes.is_class_member(std::str::from_utf8(class).unwrap())),
             Self::And(a, b) => a.matches(node) && b.matches(node),
             Self::Or(a, b) => a.matches(node) || b.matches(node),
             Self::All => true,

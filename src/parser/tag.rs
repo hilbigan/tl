@@ -4,6 +4,7 @@ use crate::{
     Bytes, InnerNodeHandle,
 };
 use std::{borrow::Cow, mem};
+use std::collections::HashSet;
 
 use super::{handle::NodeHandle, Parser};
 
@@ -29,6 +30,8 @@ pub struct Attributes<'a> {
     pub(crate) id: Option<Bytes<'a>>,
     /// A list of class names of this HTML element, if present
     pub(crate) class: Option<Bytes<'a>>,
+    /// Doc
+    pub class_map: Option<HashSet<String>>
 }
 
 impl<'a> Attributes<'a> {
@@ -38,6 +41,7 @@ impl<'a> Attributes<'a> {
             raw: InlineHashMap::new(),
             id: None,
             class: None,
+            class_map: None
         }
     }
 
@@ -59,9 +63,10 @@ impl<'a> Attributes<'a> {
     }
 
     /// Checks whether a given string is in the class names list
-    pub fn is_class_member<B: AsRef<[u8]>>(&self, member: B) -> bool {
-        self.class_iter()
-            .map_or(false, |mut i| i.any(|s| s.as_bytes() == member.as_ref()))
+    pub fn is_class_member(&self, member: &str) -> bool {
+        self.class_map.as_ref().map(|it| it.contains(member)).unwrap_or(false)
+        //self.class_iter()
+        //    .map_or(false, |mut i| i.any(|s| s.as_bytes() == member.as_ref()))
     }
 
     /// Checks whether this attributes collection contains a given key and returns its value
